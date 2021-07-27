@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+<body>
+  <h2> Covid 19 Cases in the <em>United States </em></h2>
+  <p> <strong> The total Covid 19 cases in the United States are shown in the chart </strong> </p>
+  <p>The top 3 states with <mark> highest</mark> Covid 19 incident are Califonia, Texas and New York. </p>
+  <p>As of 07/25/2021, Covid-19 cases are below:</p>
+  <div id="page1">
+
+    <script>
+
+      // set the dimensions and margins of the graph
+      var margin = {
+          top: 10,
+          right: 30,
+          bottom: 50,
+          left: 70
+        },
+        width = 500 - margin.left - margin.right,
+        height = 300 - margin.top - margin.bottom;
+
+      // append the svg object to the body of the page
+      var svg = d3.select("#page1")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+      // Parse the Data
+      d3.csv("https://raw.githubusercontent.com/yifeikang/416-project/main/final%20case.csv", function(data) {
+
+        // X axis
+        var x = d3.scaleBand()
+          .range([0, width])
+          .domain(data.map(function(d) {
+            return d.state;
+          }))
+          .padding(0.2);
+        svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x))
+          .selectAll("text")
+          .style("text-anchor", "middle")
+          .style("font", "14px times");
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+          .domain([0, 35000000])
+          .range([height, 0]);
+        svg.append("g")
+          .style("font", "14px times")
+          .attr("class", "axis")
+          .call(d3.axisLeft(y)
+            .ticks(10, "s"));
+
+        // Bars
+        svg.selectAll("mybar")
+          .data(data)
+          .enter()
+          .append("rect")
+          .attr("x", function(d) {
+            return x(d.state);
+          })
+          .attr("width", x.bandwidth())
+          .style("fill", function(d) {
+            if (d.state == "United States") {
+              return "#9370DB"
+            } else if (d.state == "Califonia") {
+              return "#CD5C5C"
+            } else if (d.state == "Texas") {
+              return "#1E90FF"
+            } else {
+              return 'green'
+            }
+          })
+          // no bar at the beginning thus:
+          .attr("height", function(d) {
+            return height - y(0);
+          }) // always equal to 0
+          .attr("y", function(d) {
+            return y(0);
+          })
+
+
+        // Animation
+        svg.selectAll("rect")
+          .transition()
+          .duration(800)
+          .attr("y", function(d) {
+            return y(d.cases);
+          })
+          .attr("height", function(d) {
+            return height - y(d.cases);
+          })
+          .delay(function(d, i) {
+            console.log(i);
+            return (i * 100)
+          })
+
+        svg.append("text")
+          .attr("transform", "translate(27,232)")
+          .attr("dy", ".35em")
+          .style("font-size", "13px")
+          .style('fill', 'white')
+          .text("34,405,810");
+
+        svg.append("text")
+          .attr("transform", "translate(127,232)")
+          .attr("dy", ".35em")
+          .style("font-size", "13px")
+          .style('fill', 'white')
+          .text("3,904,632");
+
+        svg.append("text")
+          .attr("transform", "translate(225,232)")
+          .attr("dy", ".35em")
+          .style("font-size", "13px")
+          .style('fill', 'white')
+          .text("3,069,377");
+
+        svg.append("text")
+          .attr("transform", "translate(320,232)")
+          .attr("dy", ".35em")
+          .style("font-size", "13px")
+          .style('fill', 'white')
+          .text("2,135,076");
+          // Features of the annotation
+        var annotations = [
+          {
+            note: {
+               title: "Highest Daily Case",label: "Califonia: 64,986 Texas: 58,264 New_York: 20,184",
+              align: "middle",  // try right or left
+              wrap: 150,  // try something smaller to see text split in several lines
+              padding: 10   // More = text lower
+            },
+            color: ["black"],
+            x: 120,
+            y: 20,
+            dy: 10,
+            dx: 50
+          }
+        ]
+
+        // Add annotation to the chart
+        var makeAnnotations = d3.annotation()
+          .annotations(annotations)
+
+        svg.append("g")
+           .attr("class", "annotation")
+            .append("g")
+          .call(makeAnnotations)
+      })
+    </script>
+  </div>
+
+</body>
