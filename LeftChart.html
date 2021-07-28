@@ -57,7 +57,14 @@
           .style("font", "14px times")
           .attr("class", "axis")
           .call(d3.axisLeft(y)
-            .ticks(10, "s"));
+            .ticks(10, "s"))
+            .style("font", "14px times")
+          ;
+
+          svg.append("text")
+          .attr("transform","rotate(90)")
+            .text("Total Cases")
+
 
         // Bars
         svg.selectAll("mybar")
